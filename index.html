@@ -4,19 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing game</title>
+    <title>Typing Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Typing game!</h1>
-    <p>Practice your typing skills with a quote from Sherlock Holmes. Click **start** to begin!</p>
-    <p id="quote"></p>
-    <p id="message"></p>
-    <div>
-        <input type="text" aria-label="current word" id="typed-value" />
-        <button type="button" id="start">Start</button>
-    </div>
+    <header>
+        <h1>Typing Game</h1>
+        <p>
+            Practice your typing skills with a quote from Sherlock Holmes.
+            Select the <strong>Start</strong> button to begin.
+        </p>
+    </header>
+
+    <main>
+        <section aria-labelledby="quote-heading">
+            <h2 id="quote-heading">Quote to type</h2>
+            <p id="quote"></p>
+        </section>
+
+        <section aria-labelledby="play-heading">
+            <h2 id="play-heading" class="visually-hidden">Your typing</h2>
+            <div>
+                <label for="typed-value">Type the current word</label>
+                <input type="text" id="typed-value" autocomplete="off" autocapitalize="off" spellcheck="false" />
+                <button type="button" id="start">Start</button>
+            </div>
+            <p id="message" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
     <script src="script.js"></script>
 </body>
 
