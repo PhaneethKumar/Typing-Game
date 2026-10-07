@@ -111,6 +111,7 @@ label {
     background: var(--error-bg);
     color: var(--error-text);
     border-color: var(--error-text);
+    border-style: dashed;
 }
 
 #typed-value:disabled {

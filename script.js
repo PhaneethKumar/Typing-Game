@@ -1,4 +1,3 @@
-// inside script.js
 // all of our quotes
 const quotes = [
     'When you have eliminated the impossible, whatever remains, however improbable, must be the truth.',
@@ -9,74 +8,94 @@ const quotes = [
     'Nothing clears up a case so much as stating it to another person.',
     'Education never ends, Watson. It is a series of lessons, with the greatest for the last.',
 ];
-// store the list of words and the index of the word the player is currently typing
+
+// game state
 let words = [];
+let wordElements = [];
 let wordIndex = 0;
-// the starting time
-let startTime = Date.now();
+let startTime = 0;
+
 // page elements
 const quoteElement = document.getElementById('quote');
 const messageElement = document.getElementById('message');
 const typedValueElement = document.getElementById('typed-value');
+const startButton = document.getElementById('start');
 
-document.getElementById('start').addEventListener('click', () => {
+// Highlight one word (pass -1 to clear all highlights)
+function highlightWord(index) {
+    wordElements.forEach((element, i) => {
+        const isCurrent = i === index;
+        element.classList.toggle('highlight', isCurrent);
+        if (isCurrent) {
+            element.setAttribute('aria-current', 'true');
+        } else {
+            element.removeAttribute('aria-current');
+        }
+    });
+}
+
+// Show or clear the error state on the input
+function setError(isError) {
+    typedValueElement.classList.toggle('error', isError);
+    typedValueElement.setAttribute('aria-invalid', String(isError));
+}
+
+startButton.addEventListener('click', () => {
     // get a quote
-    const quoteIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[quoteIndex];
-    // Put the quote into an array of words
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+    // put the quote into an array of words
     words = quote.split(' ');
-    // reset the word index for tracking
     wordIndex = 0;
 
-    // Create an array of span elements so we can set a class
-    const spanWords = words.map(function (word) { return `<span>${word} </span>` });
-    // Convert into string and set as innerHTML on quote display
-    quoteElement.innerHTML = spanWords.join('');
-    // Highlight the first word
-    quoteElement.childNodes[0].className = 'highlight';
-    // Clear any prior messages
-    messageElement.innerText = '';
+    // build one span per word (no innerHTML needed)
+    wordElements = words.map((word) => {
+        const span = document.createElement('span');
+        span.textContent = `${word} `;
+        return span;
+    });
+    quoteElement.replaceChildren(...wordElements);
+    highlightWord(0);
 
-    // Clear the textbox
+    // reset the UI
+    messageElement.textContent = '';
+    setError(false);
+    typedValueElement.disabled = false;
     typedValueElement.value = '';
-    // set focus
     typedValueElement.focus();
 
-    // Start the timer
-    startTime = new Date().getTime();
+    // start the timer
+    startTime = Date.now();
 });
 
 typedValueElement.addEventListener('input', () => {
-    // Get the current word
+    // ignore input if a game isn't running
+    if (words.length === 0) return;
+
     const currentWord = words[wordIndex];
-    // get the current value
     const typedValue = typedValueElement.value;
 
     if (typedValue === currentWord && wordIndex === words.length - 1) {
-        // end of sentence
-        // Display success
-        const elapsedTime = new Date().getTime() - startTime;
-        const message = `CONGRATULATIONS! You finished in ${elapsedTime / 1000} seconds.`;
-        messageElement.innerText = message;
+        // end of the quote
+        const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
+        messageElement.textContent = `Congratulations! You finished in ${elapsedSeconds} seconds.`;
+
+        highlightWord(-1);
+        setError(false);
+        typedValueElement.disabled = true;
+        // keep keyboard focus somewhere useful
+        startButton.focus();
     } else if (typedValue.endsWith(' ') && typedValue.trim() === currentWord) {
-        // end of word
-        // clear the typedValueElement for the new word
+        // end of a word: clear the input and move on
         typedValueElement.value = '';
-
-        // reset the class name for all elements in quote
-        quoteElement.childNodes[wordIndex].className = '';
-
-        // move to the next word
+        setError(false);
         wordIndex++;
-
-        // highlight the new word
-        quoteElement.childNodes[wordIndex].className = 'highlight';
+        highlightWord(wordIndex);
     } else if (currentWord.startsWith(typedValue)) {
-        // currently correct
-        // highlight the next word
-        typedValueElement.className = '';
+        // correct so far
+        setError(false);
     } else {
-        // error state
-        typedValueElement.className = 'error';
+        // mistake
+        setError(true);
     }
 });
