@@ -15,6 +15,12 @@
     --error-bg: #fde2e2;
     --error-text: #8a1c1c;
     --border: #c9c5ba;
+    --easy-bg: #1e7a3c;
+    --easy-text: #ffffff;
+    --medium-bg: #1f4e79;
+    --medium-text: #ffffff;
+    --hard-bg: #a12626;
+    --hard-text: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,6 +35,12 @@
         --error-bg: #5a1f1f;
         --error-text: #ffd9d9;
         --border: #3d4048;
+        --easy-bg: #7fd49a;
+        --easy-text: #0d2a17;
+        --medium-bg: #8ec1f0;
+        --medium-text: #10243a;
+        --hard-bg: #ff9b9b;
+        --hard-text: #3a0d0d;
     }
 }
 
@@ -124,6 +136,74 @@ section h2 {
     font-variant-numeric: tabular-nums;
 }
 
+.stat--wide {
+    grid-column: 1 / -1;
+}
+
+#difficulty-badge {
+    display: inline-block;
+    padding: 0.1rem 0.9rem;
+    border-radius: 999px;
+    font-size: 1.15rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#difficulty-badge[data-level="easy"] {
+    background: var(--easy-bg);
+    color: var(--easy-text);
+}
+
+#difficulty-badge[data-level="medium"] {
+    background: var(--medium-bg);
+    color: var(--medium-text);
+}
+
+#difficulty-badge[data-level="hard"] {
+    background: var(--hard-bg);
+    color: var(--hard-text);
+}
+
+#difficulty-badge.level-change {
+    animation: level-pulse 0.7s ease-out;
+}
+
+@keyframes level-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 var(--highlight);
+    }
+
+    40% {
+        transform: scale(1.25);
+        box-shadow: 0 0 0 0.6rem transparent;
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 transparent;
+    }
+}
+
+.streak-dots {
+    display: inline-flex;
+    gap: 0.35rem;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.dot.filled {
+    background: var(--accent);
+    transform: scale(1.15);
+}
+
 #quote {
     margin: 0;
     font-family: Georgia, "Times New Roman", serif;
@@ -207,6 +287,7 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;
+        animation: none !important;
     }
 }
 

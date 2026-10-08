@@ -65,6 +65,7 @@ const bestWpmElement = document.getElementById('best-wpm');
 const bestAccuracyElement = document.getElementById('best-accuracy');
 const gamesPlayedElement = document.getElementById('games-played');
 const streakElement = document.getElementById('streak');
+const streakDots = document.querySelectorAll('.streak-dots .dot');
 
 // Helper Functions
 // Highlight one word (pass -1 to clear all highlights)
@@ -88,16 +89,24 @@ function setError(isError) {
 function isValidDifficulty(level) {
     return Object.prototype.hasOwnProperty.call(quotesByDifficulty, level);
 }
-// Change the current level and update the UI. Falls back safely on bad input.
+// Replay the pulse animation on the difficulty badge
+function playLevelChangeAnimation() {
+    difficultyBadge.classList.remove('level-change');
+    void difficultyBadge.offsetWidth; // force reflow so the animation restarts
+    difficultyBadge.classList.add('level-change');
+}
+
 function setDifficulty(level) {
     if (!isValidDifficulty(level)) {
         console.warn(`Unknown difficulty "${level}", using "${DEFAULT_DIFFICULTY}".`);
         level = DEFAULT_DIFFICULTY;
     }
+    const changed = level !== currentDifficulty;
     currentDifficulty = level;
     difficultyBadge.textContent = DIFFICULTY_LABELS[level];
     difficultyBadge.dataset.level = level;
     difficultySelect.value = level;
+    if (changed) playLevelChangeAnimation();
 }
 // Pick a random quote for the current level, avoiding an immediate repeat
 function getQuote() {
@@ -114,6 +123,7 @@ function getQuote() {
 
 function updateStreakDisplay() {
     streakElement.textContent = streak;
+    streakDots.forEach((dot, i) => dot.classList.toggle('filled', i < streak));
 }
 // A "good" performance meets both the accuracy and the speed target for the level played
 function isGoodPerformance(wpm, accuracy, level) {
@@ -306,6 +316,10 @@ difficultySelect.addEventListener('change', () => {
     setDifficulty(difficultySelect.value);
     streak = 0;
     updateStreakDisplay();
+});
+
+difficultyBadge.addEventListener('animationend', () => {
+    difficultyBadge.classList.remove('level-change');
 });
 
 // make sure the UI matches the starting state
