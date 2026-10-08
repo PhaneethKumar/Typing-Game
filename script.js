@@ -25,8 +25,13 @@ const quotesByDifficulty = {
     ],
 };
 
+// constants
 const DEFAULT_DIFFICULTY = 'medium';
 const DIFFICULTY_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
+const STREAK_TARGET = 3;
+const MIN_ACCURACY = 95;
+const MIN_WPM_BY_LEVEL = { easy: 25, medium: 35, hard: 45 };
+const DIFFICULTY_ORDER = ['easy', 'medium', 'hard'];
 
 // game state
 let words = [];
@@ -38,6 +43,8 @@ let lastQuote = '';
 let bestWpm = 0;
 let bestAccuracy = 0;
 let gamesPlayed = 0;
+let streak = 0;
+let playedDifficulty = DEFAULT_DIFFICULTY;
 
 // typing statistics
 let totalKeystrokes = 0;
@@ -57,6 +64,7 @@ const difficultySelect = document.getElementById('difficulty-select');
 const bestWpmElement = document.getElementById('best-wpm');
 const bestAccuracyElement = document.getElementById('best-accuracy');
 const gamesPlayedElement = document.getElementById('games-played');
+const streakElement = document.getElementById('streak');
 
 // Helper Functions
 // Highlight one word (pass -1 to clear all highlights)
@@ -102,6 +110,48 @@ function getQuote() {
     const quote = candidates[Math.floor(Math.random() * candidates.length)];
     lastQuote = quote;
     return quote;
+}
+
+function updateStreakDisplay() {
+    streakElement.textContent = streak;
+}
+// A "good" performance meets both the accuracy and the speed target for the level played
+function isGoodPerformance(wpm, accuracy, level) {
+    const minWpm = MIN_WPM_BY_LEVEL[level] ?? MIN_WPM_BY_LEVEL[DEFAULT_DIFFICULTY];
+    return accuracy >= MIN_ACCURACY && wpm >= minWpm;
+}
+// Update the streak after a finished quote, change level if earned,
+// and return a short note to append to the result message.
+function evaluatePerformance(wpm, accuracy) {
+    try {
+        if (!Number.isFinite(wpm) || !Number.isFinite(accuracy)) return '';
+
+        if (!isGoodPerformance(wpm, accuracy, playedDifficulty)) {
+            streak = 0;
+            updateStreakDisplay();
+            return ` Streak reset. Aim for ${MIN_ACCURACY}% accuracy and ${MIN_WPM_BY_LEVEL[playedDifficulty]} WPM.`;
+        }
+
+        streak = Math.min(streak + 1, STREAK_TARGET);
+
+        if (streak >= STREAK_TARGET) {
+            const nextLevel = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(playedDifficulty) + 1];
+            if (nextLevel) {
+                streak = 0;
+                setDifficulty(nextLevel);
+                updateStreakDisplay();
+                return ` Streak complete! Difficulty increased to ${DIFFICULTY_LABELS[nextLevel]}.`;
+            }
+            updateStreakDisplay();
+            return ' Streak maxed out on the hardest level!';
+        }
+
+        updateStreakDisplay();
+        return ` Good run! Streak: ${streak} of ${STREAK_TARGET}.`;
+    } catch (error) {
+        console.error('Could not evaluate performance:', error);
+        return '';
+    }
 }
 // Words per minute, using the standard "5 characters = 1 word" rule
 function calculateWpm(characters, elapsedMs) {
@@ -161,6 +211,7 @@ function stopStatsTimer() {
 startButton.addEventListener('click', () => {
     // get a quote
     const quote = getQuote();
+    playedDifficulty = currentDifficulty;
 
     // put the quote into an array of words
     words = quote.split(' ');
@@ -223,10 +274,12 @@ typedValueElement.addEventListener('input', () => {
         wpmElement.textContent = finalWpm;
         accuracyElement.textContent = finalAccuracy;
         const isNewBest = recordResult(finalWpm, finalAccuracy);
+        const streakNote = evaluatePerformance(finalWpm, finalAccuracy);
         messageElement.textContent =
             `Congratulations! You finished in ${elapsedSeconds} seconds ` +
             `at ${finalWpm} words per minute with ${finalAccuracy}% accuracy.` +
-            (isNewBest ? ' New best speed!' : '');
+            (isNewBest ? ' New best speed!' : '') +
+            streakNote;
 
         highlightWord(-1);
         setError(false);
@@ -251,6 +304,8 @@ typedValueElement.addEventListener('input', () => {
 
 difficultySelect.addEventListener('change', () => {
     setDifficulty(difficultySelect.value);
+    streak = 0;
+    updateStreakDisplay();
 });
 
 // make sure the UI matches the starting state
