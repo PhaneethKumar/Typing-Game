@@ -34,6 +34,11 @@
                     <dt>Accuracy</dt>
                     <dd><span id="accuracy">100</span>%</dd>
                 </div>
+                <div class="stat">
+                    <dt>Difficulty</dt>
+                    <dd id="difficulty-badge" data-level="medium">Medium</dd>
+                    <!-- data-* attributes store extra information on an HTML element that JavaScript or CSS can use later -->
+                </div>
             </dl>
         </section>
 
@@ -41,6 +46,15 @@
             <h2 id="play-heading" class="visually-hidden">Your typing</h2>
             <div>
                 <label for="typed-value">Type the current word</label>
+                <div class="difficulty-picker">
+                    <label for="difficulty-select">Difficulty</label>
+                    <select id="difficulty-select" aria-describedby="difficulty-hint">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                    <p id="difficulty-hint" class="hint">Applies to the next quote when you press Start.</p>
+                </div>
                 <input type="text" id="typed-value" autocomplete="off" autocapitalize="off" spellcheck="false" disabled>
                 <button type="button" id="start">Start</button>
             </div>

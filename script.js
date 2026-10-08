@@ -1,19 +1,41 @@
-// all available quotes
-const quotes = [
-    'When you have eliminated the impossible, whatever remains, however improbable, must be the truth.',
-    'There is nothing more deceptive than an obvious fact.',
-    'I ought to know by this time that when a fact appears to be opposed to a long train of deductions it invariably proves to be capable of bearing some other interpretation.',
-    'I never make exceptions. An exception disproves the rule.',
-    'What one man can invent another can discover.',
-    'Nothing clears up a case so much as stating it to another person.',
-    'Education never ends, Watson. It is a series of lessons, with the greatest for the last.',
-];
+// quotes grouped by difficulty
+const quotesByDifficulty = {
+    easy: [
+        'The game is afoot.',
+        'Crime is common. Logic is rare.',
+        'I am lost without my Boswell.',
+        'You know my methods, Watson.',
+        'The world is full of obvious things which nobody observes.',
+        'It is a capital mistake to theorize before one has data.',
+    ],
+    medium: [
+        'When you have eliminated the impossible, whatever remains, however improbable, must be the truth.',
+        'There is nothing more deceptive than an obvious fact.',
+        'I ought to know by this time that when a fact appears to be opposed to a long train of deductions it invariably proves to be capable of bearing some other interpretation.',
+        'I never make exceptions. An exception disproves the rule.',
+        'What one man can invent another can discover.',
+        'Nothing clears up a case so much as stating it to another person.',
+        'Education never ends, Watson. It is a series of lessons, with the greatest for the last.',
+    ],
+    hard: [
+        'You see, but you do not observe. The distinction is clear. For example, you have frequently seen the steps which lead up from the hall to this room.',
+        'It is a capital mistake to theorize before one has data. Insensibly one begins to twist facts to suit theories, instead of theories to suit facts.',
+        'Mediocrity knows nothing higher than itself; but talent instantly recognizes genius.',
+        'My mind rebels at stagnation. Give me problems, give me work, give me the most abstruse cryptogram, or the most intricate analysis, and I am in my own proper atmosphere.',
+    ],
+};
+
+const DEFAULT_DIFFICULTY = 'medium';
+const DIFFICULTY_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
 // game state
 let words = [];
 let wordElements = [];
 let wordIndex = 0;
 let startTime = 0;
+let currentDifficulty = DEFAULT_DIFFICULTY;
+let lastQuote = '';
+
 // typing statistics
 let totalKeystrokes = 0;
 let correctKeystrokes = 0;
@@ -27,6 +49,8 @@ const typedValueElement = document.getElementById('typed-value');
 const startButton = document.getElementById('start');
 const wpmElement = document.getElementById('wpm');
 const accuracyElement = document.getElementById('accuracy');
+const difficultyBadge = document.getElementById('difficulty-badge');
+const difficultySelect = document.getElementById('difficulty-select');
 
 // Helper Functions
 // Highlight one word (pass -1 to clear all highlights)
@@ -45,6 +69,33 @@ function highlightWord(index) {
 function setError(isError) {
     typedValueElement.classList.toggle('error', isError);
     typedValueElement.setAttribute('aria-invalid', String(isError));
+}
+
+function isValidDifficulty(level) {
+    return Object.prototype.hasOwnProperty.call(quotesByDifficulty, level);
+}
+// Change the current level and update the UI. Falls back safely on bad input.
+function setDifficulty(level) {
+    if (!isValidDifficulty(level)) {
+        console.warn(`Unknown difficulty "${level}", using "${DEFAULT_DIFFICULTY}".`);
+        level = DEFAULT_DIFFICULTY;
+    }
+    currentDifficulty = level;
+    difficultyBadge.textContent = DIFFICULTY_LABELS[level];
+    difficultyBadge.dataset.level = level;
+    difficultySelect.value = level;
+}
+// Pick a random quote for the current level, avoiding an immediate repeat
+function getQuote() {
+    let pool = quotesByDifficulty[currentDifficulty];
+    if (!Array.isArray(pool) || pool.length === 0) {
+        console.warn('No quotes for this difficulty, falling back to default.');
+        pool = quotesByDifficulty[DEFAULT_DIFFICULTY];
+    }
+    const candidates = pool.length > 1 ? pool.filter((q) => q !== lastQuote) : pool;
+    const quote = candidates[Math.floor(Math.random() * candidates.length)];
+    lastQuote = quote;
+    return quote;
 }
 // Words per minute, using the standard "5 characters = 1 word" rule
 function calculateWpm(characters, elapsedMs) {
@@ -86,11 +137,10 @@ function stopStatsTimer() {
     statsTimer = null;
 }
 
-
-// Working of game
+// Handler Functions / Handlers
 startButton.addEventListener('click', () => {
     // get a quote
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    const quote = getQuote();
 
     // put the quote into an array of words
     words = quote.split(' ');
@@ -176,3 +226,10 @@ typedValueElement.addEventListener('input', () => {
         setError(true);
     }
 });
+
+difficultySelect.addEventListener('change', () => {
+    setDifficulty(difficultySelect.value);
+});
+
+// make sure the UI matches the starting state
+setDifficulty(DEFAULT_DIFFICULTY);

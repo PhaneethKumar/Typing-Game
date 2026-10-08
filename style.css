@@ -78,8 +78,28 @@ section h2 {
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
+}
+
+.difficulty-picker {
+    margin-bottom: 1rem;
+}
+
+#difficulty-select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+}
+
+.hint {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+    color: var(--muted);
 }
 
 .stat {
@@ -201,5 +221,11 @@ button:disabled {
 
     button {
         width: 100%;
+    }
+}
+
+@media (max-width: 30rem) {
+    .stats {
+        grid-template-columns: 1fr;
     }
 }
