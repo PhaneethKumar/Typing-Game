@@ -25,7 +25,7 @@
 
         <section aria-labelledby="stats-heading">
             <h2 id="stats-heading">Your stats</h2>
-            <dl class="stats" id="stats">
+            <dl class="stats" id="stats" aria-label="Typing statistics">
                 <div class="stat">
                     <dt>Speed</dt>
                     <dd><span id="wpm">0</span> WPM</dd>
@@ -38,6 +38,18 @@
                     <dt>Difficulty</dt>
                     <dd id="difficulty-badge" data-level="medium">Medium</dd>
                     <!-- data-* attributes store extra information on an HTML element that JavaScript or CSS can use later -->
+                </div>
+                <div class="stat">
+                    <dt>Best speed</dt>
+                    <dd><span id="best-wpm">0</span> WPM</dd>
+                </div>
+                <div class="stat">
+                    <dt>Best accuracy</dt>
+                    <dd><span id="best-accuracy">0</span>%</dd>
+                </div>
+                <div class="stat">
+                    <dt>Quotes finished</dt>
+                    <dd id="games-played">0</dd>
                 </div>
             </dl>
         </section>

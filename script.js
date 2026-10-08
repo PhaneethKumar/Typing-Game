@@ -35,6 +35,9 @@ let wordIndex = 0;
 let startTime = 0;
 let currentDifficulty = DEFAULT_DIFFICULTY;
 let lastQuote = '';
+let bestWpm = 0;
+let bestAccuracy = 0;
+let gamesPlayed = 0;
 
 // typing statistics
 let totalKeystrokes = 0;
@@ -51,6 +54,9 @@ const wpmElement = document.getElementById('wpm');
 const accuracyElement = document.getElementById('accuracy');
 const difficultyBadge = document.getElementById('difficulty-badge');
 const difficultySelect = document.getElementById('difficulty-select');
+const bestWpmElement = document.getElementById('best-wpm');
+const bestAccuracyElement = document.getElementById('best-accuracy');
+const gamesPlayedElement = document.getElementById('games-played');
 
 // Helper Functions
 // Highlight one word (pass -1 to clear all highlights)
@@ -131,6 +137,20 @@ function resetStats() {
     wpmElement.textContent = '0';
     accuracyElement.textContent = '100';
 }
+// Update session records after a finished quote. Returns true on a new best speed.
+function recordResult(wpm, accuracy) {
+    if (!Number.isFinite(wpm) || !Number.isFinite(accuracy)) return false;
+
+    const isNewBestWpm = gamesPlayed > 0 && wpm > bestWpm;
+    gamesPlayed++;
+    bestWpm = Math.max(bestWpm, wpm);
+    bestAccuracy = Math.max(bestAccuracy, accuracy);
+
+    bestWpmElement.textContent = bestWpm;
+    bestAccuracyElement.textContent = bestAccuracy;
+    gamesPlayedElement.textContent = gamesPlayed;
+    return isNewBestWpm;
+}
 
 function stopStatsTimer() {
     clearInterval(statsTimer);
@@ -202,9 +222,11 @@ typedValueElement.addEventListener('input', () => {
 
         wpmElement.textContent = finalWpm;
         accuracyElement.textContent = finalAccuracy;
+        const isNewBest = recordResult(finalWpm, finalAccuracy);
         messageElement.textContent =
             `Congratulations! You finished in ${elapsedSeconds} seconds ` +
-            `at ${finalWpm} words per minute with ${finalAccuracy}% accuracy.`;
+            `at ${finalWpm} words per minute with ${finalAccuracy}% accuracy.` +
+            (isNewBest ? ' New best speed!' : '');
 
         highlightWord(-1);
         setError(false);
