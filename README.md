@@ -1,6 +1,6 @@
 # Typing Game
 
-A simple, accessible typing practice game built with vanilla HTML, CSS, and
+A simple, accessible typing practice game built with HTML, CSS, and
 JavaScript. Type quotes from Sherlock Holmes, track your performance, and
 improve your speed and accuracy as the difficulty increases.
 
@@ -53,6 +53,14 @@ python -m http.server 8000
 
 Then open <http://localhost:8000> in your browser.
 
+## Technologies
+
+- HTML5
+- CSS3
+- JavaScript (ES6+)
+
+No external libraries or runtime dependencies are required.
+
 ## Project structure
 
 ```text
@@ -63,10 +71,6 @@ Then open <http://localhost:8000> in your browser.
 └── README.md   # Project documentation
 ```
 
-## Technologies
+## Credits
 
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-
-No external libraries or runtime dependencies are required.
+Assignment from [Web Development for Beginners](https://github.com/microsoft/Web-Dev-For-Beginners) by Microsoft. All code and content in this repository are my own work.
