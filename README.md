@@ -6,7 +6,7 @@ improve your speed and accuracy as the difficulty increases.
 
 ## Play online
 
-Play the deployed game here: [Typing Game](https://typing-game-pi-bice.vercel.app/)
+Play the deployed game here: [Typing Game](https://phaneethkumar.github.io/Typing-Game/)
 
 ## Features
 
@@ -65,6 +65,7 @@ No external libraries or runtime dependencies are required.
 
 ```text
 .
+├── .github/workflows/   # GitHub Actions workflow(s)
 ├── index.html   # Page structure and accessible controls
 ├── style.css    # Layout, responsive styling, themes, and animations
 ├── script.js    # Quotes, game state, scoring, and progression logic
